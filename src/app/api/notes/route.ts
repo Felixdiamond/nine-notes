@@ -77,7 +77,7 @@ export async function PUT(req: Request) {
             return Response.json({ error: "Unauthorized" }, { status: 401 })
         }
         
-        const embedding = getEmbeddingForNote(title, content);
+        const embedding = await getEmbeddingForNote(title, content);
 
         const updatedNote = await prisma.$transaction(async (tx) => {
             const updatedNote = await tx.note.update({

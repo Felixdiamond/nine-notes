@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     const { messages } = await req.json();
 
     // Truncate the messages to the last 6
-    const messagesTruncated = messages.slice(-14);
+    const messagesTruncated = messages.slice(-30);
 
     // Generate the embedding for the truncated messages
     const embedding = await getEmbedding(
@@ -81,7 +81,7 @@ ${relevantNotes
     const contents = [
       ...userMessages,
       { role: "model", parts: [{ text: systemMessage }] },
-      { role: "user", parts: [{ text: "." }] }, // Dummy user message
+      { role: "user", parts: [{ text: "." }] },
     ];
 
     console.log("my contents: ", contents);
