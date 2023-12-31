@@ -12,8 +12,13 @@ Nine Notes is an AI-powered web application for intelligent note taking and orga
 
 ## Built With
 **Next.js** - React framework
+
 **Prisma** - ORM
+
 **MongoDB** - Database
+
 **Gemini** - Chatbot model
+
 **Pinecone** - Vector database
+
 **Tailwind CSS & Shadcn** - Styling
