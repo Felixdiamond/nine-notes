@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 
     // Generate the embedding for the truncated messages
     const embedding = await getEmbedding(
-      messagesTruncated.map((message) => message.content).join("\n"),
+      messagesTruncated.map((message: Message) => message.content).join("\n"),
     );
 
     // Get the user ID

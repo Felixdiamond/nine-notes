@@ -86,8 +86,8 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
           {!error && messages.length === 0 && (
             <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-sm">
               <Bot />
-              Hi, I'm your personal assistant. Ask me anything about your notes.
-              Note: This version is currently not so smart (gemini 💀) so you'll
+              Hi, I&apos;m your personal assistant. Ask me anything about your notes.
+              Note: This version is currently not so smart (gemini 💀) so you&apos;ll
               have to be patient till i get an openai sub.
             </div>
           )}
