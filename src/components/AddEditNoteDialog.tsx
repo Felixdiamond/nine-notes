@@ -148,7 +148,7 @@ export default function AddNoteDialog({
               <div
                 style={{
                   display: "flex",
-                  gap: "1vw",
+                  gap: "1.5vw",
                 }}
               >
                 {noteToEdit && (

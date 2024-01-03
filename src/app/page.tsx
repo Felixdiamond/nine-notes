@@ -19,8 +19,8 @@ export default function Home() {
           9ine notes
         </span>
       </div>
-      <p className="max-w-prose text-center p-3">
-        Nine Notes is an AI-powered note-taking app that enhances productivity.
+      <p className="max-w-prose p-3 text-center">
+        9ine notes is an AI-powered note-taking app that enhances productivity.
         It allows you to easily create and organize notes, with AI powered
         features.
       </p>
@@ -30,6 +30,19 @@ export default function Home() {
           <ArrowRightIcon />
         </Link>
       </Button>
+      <div className="absolute bottom-2 flex h-auto w-full justify-center text-center text-xs">
+        <span>
+          Built with 💖 by{" "}
+          <Link
+            href="https://linktr.ee/ayane.9"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500"
+          >
+            Felix
+          </Link>
+        </span>
+      </div>
     </main>
   );
 }

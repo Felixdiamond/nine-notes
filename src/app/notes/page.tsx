@@ -1,10 +1,8 @@
 import AddBtn from "@/components/AddBtn";
 import ChatBtn from "@/components/ChatBtn";
 import Note from "@/components/Note";
-import { Button } from "@/components/ui/button";
 import prisma from "@/lib/db/prisma";
 import { auth } from "@clerk/nextjs";
-import { Plus } from "lucide-react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
