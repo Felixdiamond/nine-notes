@@ -8,6 +8,8 @@ import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import "./AIChatBox.css";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface AIChatBoxProps {
   open: boolean;
@@ -44,7 +46,7 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
   return (
     <div
       className={cn(
-        "bottom-0 right-0 z-10 w-full max-w-[500px] p-1 sm:w-full lg:w-3/5",
+        "bottom-0 right-0 z-10 p-1 lg:w-3/5 maindiv",
         open ? "fixed" : "hidden",
       )}
     >
@@ -63,8 +65,8 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
             d="M6 18 18 6M6 6l12 12"
           />
         </svg>
-      <div className="flex h-[540px] flex-col rounded border bg-background shadow-xl">
-        <div className="mt-3 h-full overflow-y-auto px-3" ref={scrollRef}>
+      <div className="flex h-[540px] flex-col rounded bg-background shadow-xl innerdiv">
+        <div className="mt-3 h-full !w-full overflow-y-auto px-3" ref={scrollRef}>
           {messages.map((message) => (
             <ChatMessage message={message} key={message.id} />
           ))}
@@ -87,9 +89,9 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
           {!error && messages.length === 0 && (
             <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-sm">
               <Bot />
+              <span className="text-xs px-3">
               Hi, I&apos;m your personal assistant. Ask me anything about your notes.
-              Note: This version is currently not so smart (gemini 💀) so you&apos;ll
-              have to be patient till i get an openai sub.
+              </span>
             </div>
           )}
         </div>
@@ -98,7 +100,7 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
             title="clear-chat"
             variant={"outline"}
             size={"icon"}
-            className="mr-2 shrink-0 border-none outline-none"
+            className="mr-1 shrink-0 border-none outline-none"
             type="button"
             onClick={() => setMessages([])}
           >
@@ -166,7 +168,9 @@ function ChatMessage({
           isAIMessage ? "bg-background" : "bg-primary text-primary-foreground",
         )}
       >
-        {content}
+        <ReactMarkdown className="react-markdown" remarkPlugins={[remarkGfm]}>
+          {content}
+        </ReactMarkdown>
       </p>
       {!isAIMessage && user?.imageUrl && (
         <Image

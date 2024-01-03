@@ -19,7 +19,7 @@ export default function Home() {
           9ine notes
         </span>
       </div>
-      <p className="max-w-prose text-center">
+      <p className="max-w-prose text-center p-3">
         Nine Notes is an AI-powered note-taking app that enhances productivity.
         It allows you to easily create and organize notes, with AI powered
         features.

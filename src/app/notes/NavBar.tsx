@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import logo from "@/assets/logo.png";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, currentUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -21,7 +21,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-export default function NavBar() {
+export default function NavBar({ user }: { user: string }) {
   const { theme } = useTheme();
 
   const [showAddNoteDialog, setShowAddNoteDialog] = useState(false);
@@ -87,8 +87,8 @@ export default function NavBar() {
                   </SheetDescription>
                 </SheetHeader>
                 <div className="items flex flex-col justify-end gap-5 py-5">
-                  <div className="flex items-center gap-3 justify-end mr-3">
-                    <span className="text-sm text-right">diamondfelix006@gmail.com</span>
+                  <div className="mr-3 flex items-center justify-end gap-3">
+                    <span className="text-right text-sm">{user}</span>
                     <UserButton
                       afterSignOutUrl="/"
                       appearance={{
@@ -102,22 +102,35 @@ export default function NavBar() {
                       }}
                     />
                   </div>
-                  <div className="flex items-center gap-3 justify-end mr-3">
+                  <div className="mr-3 flex items-center justify-end gap-3">
                     <span className="text-sm">Change theme</span>
                     <ThemeToggleButton />
                   </div>
-                  <Button onClick={() => setShowAddNoteDialog(true)} className="w-5/6 mx-auto">
+                  <Button
+                    onClick={() => setShowAddNoteDialog(true)}
+                    className="mx-auto w-5/6"
+                  >
                     <Plus size={16} className="mr-2" />
                     Add Note
                   </Button>
                 </div>
-                <SheetFooter className="absolute bottom-2 flex justify-center text-center text-xs w-full">
-                  Built with 💖 by Felix
+                <SheetFooter className="absolute bottom-2 flex h-auto w-full justify-center text-center text-xs">
+                  <span>
+                    Built with 💖 by{" "}
+                    <Link
+                      href="https://linktr.ee/ayane.9"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500"
+                    >
+                      Felix
+                    </Link>
+                  </span>
                 </SheetFooter>
               </SheetContent>
             </Sheet>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               <UserButton
                 afterSignOutUrl="/"
                 appearance={{

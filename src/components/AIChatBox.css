@@ -1,11 +1,50 @@
 .cool-hover {
   transition:
-    background-color 0.5s ease,
     transform 0.5s ease;
-  background-color: #ffffff;
 }
 
 .cool-hover:hover {
-  background-color: #faf9f6;
   transform: scale(1.05);
+}
+
+.maindiv {
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    @media (min-width: 769px) and (max-width: 1024px) {
+        height: 90% !important;
+        width: 50% !important;
+    }
+    @media (min-width: 1025px) {
+        height: 90% !important;
+        width: 45% !important;
+    }
+}
+
+.innerdiv {
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* This applies to all scrollable elements */
+::-webkit-scrollbar {
+  width: 5px; /* Thinner scrollbar */
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+  border-radius: 10px; /* Rounded corners */
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888; 
+  border-radius: 10px; /* Rounded corners */
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
 }
