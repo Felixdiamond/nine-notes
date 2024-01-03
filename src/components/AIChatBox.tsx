@@ -7,6 +7,7 @@ import { Message } from "ai";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
+import "./AIChatBox.css";
 
 interface AIChatBoxProps {
   open: boolean;
@@ -122,7 +123,7 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
             placeholder="Ask me anything about your notes"
             ref={inputRef}
           />
-          <Button type="submit" className="ml-1 bg-transparent p-3">
+          <Button type="submit" className="ml-1 p-3 cool-hover">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

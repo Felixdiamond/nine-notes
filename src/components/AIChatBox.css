@@ -1,0 +1,11 @@
+.cool-hover {
+  transition:
+    background-color 0.5s ease,
+    transform 0.5s ease;
+  background-color: #ffffff;
+}
+
+.cool-hover:hover {
+  background-color: #faf9f6;
+  transform: scale(1.05);
+}
