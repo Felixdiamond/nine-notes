@@ -25,6 +25,7 @@ import { useRouter } from "next/navigation";
 import { Note } from "@prisma/client";
 import { useState } from "react";
 import { useNotes } from "@/contexts/NotesContext";
+import { useToast } from "@/components/ui/use-toast";
 
 interface AddNoteDialogProps {
   open: boolean;
@@ -38,8 +39,8 @@ export default function AddNoteDialog({
   noteToEdit,
 }: AddNoteDialogProps) {
   const [deletionInProgress, setDeletionInProgress] = useState(false);
-  const router = useRouter();
   const { addNote, updateNote, deleteNote } = useNotes();
+  const { toast } = useToast();
 
   const form = useForm<CreateNoteSchema>({
     resolver: zodResolver(createNoteSchema),
@@ -52,41 +53,51 @@ export default function AddNoteDialog({
   async function onSubmit(input: CreateNoteSchema) {
     try {
       if (noteToEdit) {
-        const updatedNote = { ...noteToEdit, ...input };
-        updateNote(updatedNote);
-        setOpen(false);
-
+        const updatedNote: Note = {
+          ...noteToEdit,
+          ...input,
+          content: input.content || null,
+        };
+        
         const response = await fetch("/api/notes", {
           method: "PUT",
           body: JSON.stringify({
             id: noteToEdit.id,
             ...input,
+            content: input.content || null,
           }),
         });
         if (!response.ok) throw new Error("Status code: " + response.status);
+        
+        const savedNote: Note = await response.json();
+        updateNote(savedNote);
+        setOpen(false);
       } else {
-        const newNote: Note = {
-          id: Date.now().toString(), // Temporary ID
+        const newNote: Omit<Note, "id"> = {
           ...input,
+          content: input.content || null,
           userId: "temp-user-id",
           createdAt: new Date(),
           updatedAt: new Date(),
         };
-        addNote(newNote);
-        setOpen(false);
-
+  
         const response = await fetch("/api/notes", {
           method: "POST",
-          body: JSON.stringify(input),
+          body: JSON.stringify(newNote),
         });
         if (!response.ok) throw new Error("Status code: " + response.status);
-        const savedNote = await response.json();
-        updateNote(savedNote.note); // Update with the actual saved note
+        
+        const savedNote: Note = await response.json();
+        addNote(savedNote);
+        setOpen(false);
       }
       form.reset();
     } catch (error) {
       console.error(error);
-      // Handle error (e.g., show an error message to the user)
+      toast({
+        title: "An error occurred",
+        description: "Failed to save the note. Please try again.",
+      });
     }
   }
 
@@ -94,7 +105,7 @@ export default function AddNoteDialog({
     if (!noteToEdit) return;
     setDeletionInProgress(true);
     try {
-      deleteNote(noteToEdit.id);
+      await deleteNote(noteToEdit.id);
       setOpen(false);
 
       const response = await fetch("/api/notes", {
@@ -106,12 +117,15 @@ export default function AddNoteDialog({
       if (!response.ok) throw new Error("Status code: " + response.status);
     } catch (error) {
       console.error(error);
-      // Handle error (e.g., show an error message to the user)
+      toast({
+        title: "An error occurred",
+        description: "Failed to delete the note. Please try again.",
+      });
     } finally {
       setDeletionInProgress(false);
     }
   }
-  
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[425px]">
@@ -162,7 +176,7 @@ export default function AddNoteDialog({
                   variant="destructive"
                   loading={deletionInProgress}
                   disabled={form.formState.isSubmitting || deletionInProgress}
-                  onClick={deleteNote}
+                  onClick={() => handleDelete()}
                   type="button"
                   className="w-full sm:w-auto"
                 >

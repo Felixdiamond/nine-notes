@@ -43,9 +43,9 @@ export default function Note({ note }: NoteProps) {
           </CardDescription>
         </CardHeader>
         <CardContent className="mt-4">
-          <p className="line-clamp-3 whitespace-pre-line text-gray-600 sm:text-sm">
+          <div className="line-clamp-3 whitespace-pre-line text-gray-600 sm:text-sm">
             {note.content}
-          </p>
+          </div>
         </CardContent>
       </Card>
       <AddNoteDialog
