@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
+import { ClerkLoaded, ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "./ThemeProvider";
 import ClientNotesProvider from "@/components/ClientNotesProvider";
 import { Toaster } from "@/components/ui/toaster"
@@ -24,7 +24,9 @@ export default function RootLayout({
       <html lang="en">
         <body className={inter.className}>
           <ClientNotesProvider>
-            <ThemeProvider attribute="class">{children}</ThemeProvider>
+            <ThemeProvider attribute="class">
+              <ClerkLoaded>{children}</ClerkLoaded>
+            </ThemeProvider>
             <Toaster />
           </ClientNotesProvider>
         </body>
