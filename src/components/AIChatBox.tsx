@@ -73,7 +73,7 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
                 variant="ghost"
                 size="icon"
                 onClick={onClose}
-                className="rounded-full hover:bg-gray-200"
+                className="rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

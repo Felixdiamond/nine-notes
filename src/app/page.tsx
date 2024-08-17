@@ -9,7 +9,9 @@ import { redirect } from "next/navigation";
 export default function Home() {
   const { userId } = auth();
 
-  if (userId) redirect("/notes");
+  if (userId) {
+    redirect("/notes");
+  }
 
   return (
     <main className="flex h-screen flex-col items-center justify-center gap-5">
@@ -34,7 +36,7 @@ export default function Home() {
         <span>
           Built with 💖 by{" "}
           <Link
-            href="https://linktr.ee/ayane.9"
+            href="https://www.linkedin.com/in/felix-dawodu-ba2b08211"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-500"

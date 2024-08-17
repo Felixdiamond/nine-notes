@@ -3,12 +3,16 @@ import NavBar from "./NavBar";
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const user = await currentUser();
-  let infopassed: string = " ";
-  if (user!.firstName == null) {
-    infopassed = user?.emailAddresses[0].emailAddress!;
-  } else {
-    infopassed = user!.firstName! + " " + user!.lastName!;
+  let infopassed: string = "Guest";
+  
+  if (user) {
+    if (user.firstName) {
+      infopassed = `${user.firstName} ${user.lastName || ''}`.trim();
+    } else if (user.emailAddresses && user.emailAddresses.length > 0) {
+      infopassed = user.emailAddresses[0].emailAddress;
+    }
   }
+
   return (
     <>
       <NavBar user={infopassed} />

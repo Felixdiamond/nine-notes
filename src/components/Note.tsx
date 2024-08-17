@@ -11,6 +11,7 @@ import {
 import AddNoteDialog from "./AddEditNoteDialog";
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
+import { Dot } from "lucide-react";
 
 interface NoteProps {
   note: NoteModel;
@@ -34,9 +35,11 @@ export default function Note({ note }: NoteProps) {
           <CardTitle className="truncate text-xl font-bold">
             {note.title}
           </CardTitle>
-          <CardDescription className="text-sm text-[#808080] dark:text-gray-200">
+          <CardDescription className="text-sm text-gray-700 dark:text-gray-200">
+            <div className="flex">
             {timeAgo}
-            {wasUpdated && " (updated)"}
+            {wasUpdated && <Dot />}
+            </div>
           </CardDescription>
         </CardHeader>
         <CardContent className="mt-4">
