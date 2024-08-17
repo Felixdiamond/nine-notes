@@ -10,6 +10,7 @@ import {
 } from "./ui/card";
 import AddNoteDialog from "./AddEditNoteDialog";
 import { useState } from "react";
+import { formatDistanceToNow } from "date-fns";
 
 interface NoteProps {
   note: NoteModel;
@@ -18,23 +19,28 @@ interface NoteProps {
 export default function Note({ note }: NoteProps) {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const wasUpdated = note.updatedAt > note.createdAt;
-
-  const leTimestamp = (
-    wasUpdated ? note.updatedAt : note.createdAt
-  ).toDateString();
+  const timeAgo = formatDistanceToNow(
+    wasUpdated ? note.updatedAt : note.createdAt,
+    { addSuffix: true },
+  );
 
   return (
     <>
-      <Card className="cursor-pointer transition-shadow hover:shadow-mdm" onClick={() => setShowEditDialog(true)}>
+      <Card
+        className="cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+        onClick={() => setShowEditDialog(true)}
+      >
         <CardHeader>
-          <CardTitle>{note.title}</CardTitle>
-          <CardDescription className="text-sm">
-            {leTimestamp}
+          <CardTitle className="truncate text-xl font-bold">
+            {note.title}
+          </CardTitle>
+          <CardDescription className="text-sm text-[#808080] dark:text-gray-200">
+            {timeAgo}
             {wasUpdated && " (updated)"}
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <p className="whitespace-pre-line text-gray-500 sm:text-sm">
+        <CardContent className="mt-4">
+          <p className="line-clamp-3 whitespace-pre-line text-gray-600 sm:text-sm">
             {note.content}
           </p>
         </CardContent>

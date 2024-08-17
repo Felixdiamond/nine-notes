@@ -1,15 +1,16 @@
 import { cn } from "@/lib/utils";
 import { useChat } from "ai/react";
-import { Bot, BotIcon, Trash, XCircle } from "lucide-react";
+import { Bot, BotIcon, Trash } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Message } from "ai";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, KeyboardEvent } from "react";
 import "./AIChatBox.css";
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface AIChatBoxProps {
   open: boolean;
@@ -43,107 +44,141 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
 
   const lastMessageIsUser = messages[messages.length - 1]?.role === "user";
 
+  const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e as any);
+    }
+  };
+
   return (
-    <div
-      className={cn(
-        "bottom-0 right-0 z-10 p-1 lg:w-3/5 maindiv",
-        open ? "fixed" : "hidden",
-      )}
-    >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="h-6 w-6 absolute right-3 mb-1 ms-auto mt-3 block cursor-pointer"
-          onClick={() => onClose()}
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          transition={{ duration: 0.3 }}
+          className="fixed bottom-0 right-0 z-10 max-w-2xl p-4 lg:w-3/5"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M6 18 18 6M6 6l12 12"
-          />
-        </svg>
-      <div className="flex h-[540px] flex-col rounded bg-background shadow-xl innerdiv">
-        <div className="mt-3 h-full !w-full overflow-y-auto px-3" ref={scrollRef}>
-          {messages.map((message) => (
-            <ChatMessage message={message} key={message.id} />
-          ))}
-          {isLoading && lastMessageIsUser && (
-            <ChatMessage
-              message={{
-                role: "assistant",
-                content: "Thinking...",
-              }}
-            />
-          )}
-          {error && (
-            <ChatMessage
-              message={{
-                role: "assistant",
-                content: "Something went wrong. Please try again later.",
-              }}
-            />
-          )}
-          {!error && messages.length === 0 && (
-            <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-sm">
-              <Bot />
-              <span className="text-xs px-3">
-              Hi, I&apos;m your personal assistant. Ask me anything about your notes.
-              </span>
-            </div>
-          )}
-        </div>
-        <form onSubmit={handleSubmit} className="m-3 flex gap-1">
-          <Button
-            title="clear-chat"
-            variant={"outline"}
-            size={"icon"}
-            className="mr-1 shrink-0 border-none outline-none"
-            type="button"
-            onClick={() => setMessages([])}
+          <motion.div
+            className="flex flex-col overflow-hidden rounded-lg bg-background shadow-2xl"
+            initial={{ height: 0 }}
+            animate={{ height: "540px" }}
+            transition={{ duration: 0.3 }}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="h-6 w-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-              />
-            </svg>
-          </Button>
-          <Input
-            value={input}
-            onChange={handleInputChange}
-            placeholder="Ask me anything about your notes"
-            ref={inputRef}
-          />
-          <Button type="submit" className="ml-1 p-3 cool-hover">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="h-6 w-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
-              />
-            </svg>
-          </Button>
-        </form>
-      </div>
-    </div>
+            <div className="flex items-center justify-between border-b p-4">
+              <h2 className="text-lg font-semibold">AI Assistant</h2>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onClose}
+                className="rounded-full hover:bg-gray-200"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="h-6 w-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </Button>
+            </div>
+            <div className="flex-grow overflow-y-auto p-4" ref={scrollRef}>
+              <AnimatePresence>
+                {messages.map((message) => (
+                  <motion.div
+                    key={message.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ChatMessage message={message} />
+                  </motion.div>
+                ))}
+                {isLoading && lastMessageIsUser && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                  >
+                    <ChatMessage
+                      message={{
+                        role: "assistant",
+                        content: "Thinking...",
+                      }}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              {error && (
+                <ChatMessage
+                  message={{
+                    role: "assistant",
+                    content: "Something went wrong. Please try again later.",
+                  }}
+                />
+              )}
+              {!error && messages.length === 0 && (
+                <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
+                  <Bot className="h-12 w-12 text-gray-400" />
+                  <span className="max-w-xs text-sm text-gray-500">
+                    Hi, I'm your personal assistant. Ask me anything about your
+                    notes.
+                  </span>
+                </div>
+              )}
+            </div>
+            <form onSubmit={handleSubmit} className="border-t p-4">
+              <div className="flex items-center gap-2">
+                <Button
+                  title="clear-chat"
+                  variant="outline"
+                  size="icon"
+                  className="shrink-0"
+                  type="button"
+                  onClick={() => setMessages([])}
+                >
+                  <Trash className="h-4 w-4" />
+                </Button>
+                <Input
+                  value={input}
+                  onChange={handleInputChange}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Ask me anything about your notes"
+                  ref={inputRef}
+                  className="flex-grow"
+                />
+                <Button type="submit" className="shrink-0">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="h-5 w-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 12L3.269 3.125A59.769 59.769 0 0121.485 12 59.768 59.768 0 013.27 20.875L5.999 12zm0 0h7.5"
+                    />
+                  </svg>
+                </Button>
+              </div>
+            </form>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -154,32 +189,42 @@ function ChatMessage({
 }) {
   const { user } = useUser();
   const isAIMessage = role === "assistant";
+
   return (
     <div
       className={cn(
-        "mb-3 flex items-center",
-        isAIMessage ? "me-5 justify-start" : "ms-5 justify-end",
+        "mb-4 flex items-start",
+        isAIMessage ? "justify-start" : "justify-end",
       )}
     >
-      {isAIMessage && <BotIcon className="mr-2 shrink-0" />}
-      <p
+      {isAIMessage && (
+        <div className="mr-2 flex-shrink-0">
+          <BotIcon className="h-8 w-8 text-blue-500" />
+        </div>
+      )}
+      <div
         className={cn(
-          "whitespace-pre-line rounded-md border px-3 py-2",
-          isAIMessage ? "bg-background" : "bg-primary text-primary-foreground",
+          "max-w-[80%] rounded-lg px-4 py-2",
+          isAIMessage ? "bg-gray-100 text-gray-800" : "bg-blue-500 text-white",
         )}
       >
-        <ReactMarkdown className="react-markdown" remarkPlugins={[remarkGfm]}>
+        <ReactMarkdown
+          className="react-markdown text-sm"
+          remarkPlugins={[remarkGfm]}
+        >
           {content}
         </ReactMarkdown>
-      </p>
+      </div>
       {!isAIMessage && user?.imageUrl && (
-        <Image
-          src={user.imageUrl}
-          alt="user image"
-          width={100}
-          height={100}
-          className="ml-2 h-10 w-10 rounded-full object-cover"
-        />
+        <div className="ml-2 flex-shrink-0">
+          <Image
+            src={user.imageUrl}
+            alt="user image"
+            width={32}
+            height={32}
+            className="rounded-full object-cover"
+          />
+        </div>
       )}
     </div>
   );

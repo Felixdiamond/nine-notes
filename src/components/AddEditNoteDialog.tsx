@@ -24,6 +24,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useRouter } from "next/navigation";
 import { Note } from "@prisma/client";
 import { useState } from "react";
+import { useNotes } from "@/contexts/NotesContext";
 
 interface AddNoteDialogProps {
   open: boolean;
@@ -38,6 +39,8 @@ export default function AddNoteDialog({
 }: AddNoteDialogProps) {
   const [deletionInProgress, setDeletionInProgress] = useState(false);
   const router = useRouter();
+  const { addNote, updateNote, deleteNote } = useNotes();
+
   const form = useForm<CreateNoteSchema>({
     resolver: zodResolver(createNoteSchema),
     defaultValues: {
@@ -49,6 +52,10 @@ export default function AddNoteDialog({
   async function onSubmit(input: CreateNoteSchema) {
     try {
       if (noteToEdit) {
+        const updatedNote = { ...noteToEdit, ...input };
+        updateNote(updatedNote);
+        setOpen(false);
+
         const response = await fetch("/api/notes", {
           method: "PUT",
           body: JSON.stringify({
@@ -58,33 +65,38 @@ export default function AddNoteDialog({
         });
         if (!response.ok) throw new Error("Status code: " + response.status);
       } else {
+        const newNote: Note = {
+          id: Date.now().toString(), // Temporary ID
+          ...input,
+          userId: "temp-user-id",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        addNote(newNote);
+        setOpen(false);
+
         const response = await fetch("/api/notes", {
           method: "POST",
           body: JSON.stringify(input),
         });
         if (!response.ok) throw new Error("Status code: " + response.status);
-        form.reset();
+        const savedNote = await response.json();
+        updateNote(savedNote.note); // Update with the actual saved note
       }
-      router.refresh();
-      setOpen(false);
+      form.reset();
     } catch (error) {
       console.error(error);
-      return (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            Something went wrong. Please try again.
-          </AlertDescription>
-        </Alert>
-      );
+      // Handle error (e.g., show an error message to the user)
     }
   }
 
-  async function deleteNote() {
+  async function handleDelete() {
     if (!noteToEdit) return;
     setDeletionInProgress(true);
     try {
+      deleteNote(noteToEdit.id);
+      setOpen(false);
+
       const response = await fetch("/api/notes", {
         method: "DELETE",
         body: JSON.stringify({
@@ -92,40 +104,36 @@ export default function AddNoteDialog({
         }),
       });
       if (!response.ok) throw new Error("Status code: " + response.status);
-      router.refresh();
-      setOpen(false);
     } catch (error) {
       console.error(error);
-      return (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            Something went wrong. Please try again.
-          </AlertDescription>
-        </Alert>
-      );
+      // Handle error (e.g., show an error message to the user)
     } finally {
       setDeletionInProgress(false);
     }
   }
-
+  
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{ noteToEdit ? 'Edit Note' : 'Add Note' }</DialogTitle>
+          <DialogTitle className="text-2xl font-bold">
+            {noteToEdit ? "Edit Note" : "Add Note"}
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Note title</FormLabel>
+                  <FormLabel className="text-lg">Note title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Note title" {...field} />
+                    <Input
+                      placeholder="Enter note title"
+                      {...field}
+                      className="p-3 text-lg"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -136,47 +144,40 @@ export default function AddNoteDialog({
               name="content"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Note content</FormLabel>
+                  <FormLabel className="text-lg">Note content</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Note content" {...field} />
+                    <Textarea
+                      placeholder="Enter note content"
+                      {...field}
+                      className="min-h-[200px] p-3 text-base"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <DialogFooter>
-              <div
-                style={{
-                  display: "flex",
-                  gap: "1.5vw",
-                }}
-              >
-                {noteToEdit && (
-                  <LoadingButton
-                    variant={"destructive"}
-                    loading={deletionInProgress}
-                    disabled={form.formState.isSubmitting || deletionInProgress}
-                    onClick={deleteNote}
-                    type="button"
-                    style={{
-                      width: "100%",
-                    }}
-                  >
-                    Delete note
-                  </LoadingButton>
-                )}
+            <div className="flex justify-end gap-4">
+              {noteToEdit && (
                 <LoadingButton
-                  type="submit"
-                  loading={form.formState.isSubmitting}
+                  variant="destructive"
+                  loading={deletionInProgress}
                   disabled={form.formState.isSubmitting || deletionInProgress}
-                  style={{
-                    width: "100%",
-                  }}
+                  onClick={deleteNote}
+                  type="button"
+                  className="w-full sm:w-auto"
                 >
-                  { noteToEdit ? 'Edit note' : 'Add note' }
+                  Delete note
                 </LoadingButton>
-              </div>
-            </DialogFooter>
+              )}
+              <LoadingButton
+                type="submit"
+                loading={form.formState.isSubmitting}
+                disabled={form.formState.isSubmitting || deletionInProgress}
+                className="w-full sm:w-auto"
+              >
+                {noteToEdit ? "Save changes" : "Add note"}
+              </LoadingButton>
+            </div>
           </form>
         </Form>
       </DialogContent>
