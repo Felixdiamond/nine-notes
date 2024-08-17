@@ -131,7 +131,7 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
                 <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
                   <Bot className="h-12 w-12 text-gray-400" />
                   <span className="max-w-xs text-sm text-gray-500">
-                    Hi, I'm your personal assistant. Ask me anything about your
+                    Hi, I&apos;m your personal assistant. Ask me anything about your
                     notes.
                   </span>
                 </div>
