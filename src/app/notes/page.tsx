@@ -1,5 +1,5 @@
 import AddBtn from "@/components/AddBtn";
-import ChatBtn from "@/components/ChatBtn";
+import ChatManager from "@/components/ChatManager";
 import Note from "@/components/Note";
 import prisma from "@/lib/db/prisma";
 import { auth } from "@clerk/nextjs";
@@ -31,7 +31,7 @@ export default async function NotesPage() {
           </div>
         )}
       </div>
-      <ChatBtn />
+      <ChatManager />
     </>
   );
 }

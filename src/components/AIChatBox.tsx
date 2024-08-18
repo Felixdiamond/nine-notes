@@ -59,7 +59,7 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
           transition={{ duration: 0.3 }}
-          className="fixed bottom-0 right-0 z-10 max-w-2xl p-4 lg:w-3/5"
+          className="fixed bottom-0 right-0 z-20 max-w-2xl p-4 lg:w-3/5"
         >
           <motion.div
             className="flex flex-col overflow-hidden rounded-lg bg-background shadow-2xl"
