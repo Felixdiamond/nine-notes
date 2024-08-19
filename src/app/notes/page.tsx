@@ -1,26 +1,20 @@
+// app/notes/page.tsx
+"use client";
+
+import { useNotes } from "@/contexts/NotesContext";
 import AddBtn from "@/components/AddBtn";
 import ChatManager from "@/components/ChatManager";
 import Note from "@/components/Note";
-import prisma from "@/lib/db/prisma";
-import { auth } from "@clerk/nextjs";
-import { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "My notes - 9notes",
-};
-
-export default async function NotesPage() {
-  const { userId } = auth();
-  if (!userId) throw new Error("Not authenticated");
-
-  const allNotes = await prisma.note.findMany({ where: { userId } });
+export default function NotesPage() {
+  const { notes } = useNotes();
 
   return (
     <>
       <div className="min-h-[calc(100vh-105px)] p-4">
-        {allNotes.length > 0 ? (
+        {notes.length > 0 ? (
           <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-            {allNotes.map((note) => (
+            {notes.map((note) => (
               <Note note={note} key={note.id} />
             ))}
           </div>

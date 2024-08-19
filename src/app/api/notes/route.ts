@@ -4,6 +4,39 @@ import { getEmbedding } from "@/lib/gemini";
 import { createNoteSchema, deleteNoteSchema, updateNoteSchema } from "@/lib/validation/note";
 import { auth } from "@clerk/nextjs";
 
+export async function GET(req: Request) {
+    try {
+        const { userId } = auth();
+        if (!userId) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 })
+        }
+
+        const url = new URL(req.url);
+        const page = parseInt(url.searchParams.get('page') || '1');
+        const limit = parseInt(url.searchParams.get('limit') || '10');
+        const skip = (page - 1) * limit;
+
+        const notes = await prisma.note.findMany({
+            where: { userId },
+            orderBy: { updatedAt: 'desc' },
+            take: limit,
+            skip: skip
+        });
+
+        const totalCount = await prisma.note.count({ where: { userId } });
+
+        return Response.json({
+            notes,
+            currentPage: page,
+            totalPages: Math.ceil(totalCount / limit),
+            totalCount
+        });
+    } catch (error) {
+        console.error(error);
+        return Response.json({ error: "Internal server error" }, { status: 500 })
+    }
+}
+
 export async function POST(req: Request) {
     try {
         const body = await req.json();

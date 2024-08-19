@@ -19,9 +19,6 @@ import {
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import LoadingButton from "./ui/loading-button";
-import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useRouter } from "next/navigation";
 import { Note } from "@prisma/client";
 import { useState } from "react";
 import { useNotes } from "@/contexts/NotesContext";
@@ -58,7 +55,10 @@ export default function AddNoteDialog({
           ...input,
           content: input.content || null,
         };
-        
+
+        updateNote(updatedNote); // Optimistic update
+        setOpen(false);
+
         const response = await fetch("/api/notes", {
           method: "PUT",
           body: JSON.stringify({
@@ -68,28 +68,30 @@ export default function AddNoteDialog({
           }),
         });
         if (!response.ok) throw new Error("Status code: " + response.status);
-        
+
         const savedNote: Note = await response.json();
-        updateNote(savedNote);
-        setOpen(false);
+        updateNote(savedNote); // Update with server response
       } else {
-        const newNote: Omit<Note, "id"> = {
+        const newNote: Note = {
+          id: Date.now().toString(), // Temporary ID
           ...input,
           content: input.content || null,
           userId: "temp-user-id",
           createdAt: new Date(),
           updatedAt: new Date(),
         };
-  
+
+        addNote(newNote); // Optimistic update
+        setOpen(false);
+
         const response = await fetch("/api/notes", {
           method: "POST",
           body: JSON.stringify(newNote),
         });
         if (!response.ok) throw new Error("Status code: " + response.status);
-        
+
         const savedNote: Note = await response.json();
-        addNote(savedNote);
-        setOpen(false);
+        updateNote(savedNote); // Update with server response
       }
       form.reset();
     } catch (error) {
@@ -105,7 +107,7 @@ export default function AddNoteDialog({
     if (!noteToEdit) return;
     setDeletionInProgress(true);
     try {
-      await deleteNote(noteToEdit.id);
+      deleteNote(noteToEdit.id); // Optimistic update
       setOpen(false);
 
       const response = await fetch("/api/notes", {
