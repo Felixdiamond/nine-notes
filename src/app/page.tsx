@@ -3,16 +3,9 @@ import logo from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRightIcon } from "lucide-react";
-import { auth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 
 export default function Home() {
-  const { userId } = auth();
-
-  if (userId) {
-    redirect("/notes");
-  }
-
   return (
     <main className="flex h-screen flex-col items-center justify-center gap-5">
       <div className="flex items-center gap-4">
@@ -27,7 +20,7 @@ export default function Home() {
         features.
       </p>
       <Button asChild>
-        <Link href={"/notes"}>
+        <Link href={"/auth/sign-in"} prefetch>
           Get Started&nbsp;
           <ArrowRightIcon />
         </Link>

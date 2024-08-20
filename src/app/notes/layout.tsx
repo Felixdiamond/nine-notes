@@ -1,4 +1,4 @@
-import { currentUser } from "@clerk/nextjs";
+import { useUser } from "@supabase/auth-helpers-react";
 import NavBar from "./NavBar";
 import { Suspense } from "react";
 
@@ -47,7 +47,7 @@ function Loading() {
 async function UserData() {
   let infopassed: string = "Guest";
   try {
-    const user = await currentUser();
+    const user = useUser();
     if (user) {
       if (user.firstName) {
         infopassed = `${user.firstName} ${user.lastName || ""}`.trim();
@@ -62,6 +62,7 @@ async function UserData() {
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  console.log("children", children);
   return (
     <>
       <Suspense fallback={<Loading />}>

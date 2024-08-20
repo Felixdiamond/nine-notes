@@ -4,13 +4,14 @@ import { Bot, BotIcon, Trash } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Message } from "ai";
-import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { useEffect, useRef, KeyboardEvent } from "react";
 import "./AIChatBox.css";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import { Database } from '@/lib/database.types';
 
 interface AIChatBoxProps {
   open: boolean;
@@ -29,6 +30,7 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
   } = useChat();
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const supabase = useSupabaseClient<Database>();
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -131,7 +133,7 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
                 <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
                   <Bot className="h-12 w-12 text-gray-400" />
                   <span className="max-w-xs text-sm text-gray-500">
-                    Hi, I&apos;m your personal assistant. Ask me anything about your
+                    Hi, I'm your personal assistant. Ask me anything about your
                     notes.
                   </span>
                 </div>
@@ -187,7 +189,21 @@ function ChatMessage({
 }: {
   message: Pick<Message, "role" | "content"> & { id?: string | undefined };
 }) {
-  const { user } = useUser();
+  const supabase = useSupabaseClient<Database>();
+  const [userAvatar, setUserAvatar] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchUserAvatar() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.user_metadata?.avatar_url) {
+        setUserAvatar(user.user_metadata.avatar_url);
+      }
+    }
+    if (role === "user") {
+      fetchUserAvatar();
+    }
+  }, [role, supabase.auth]);
+
   const isAIMessage = role === "assistant";
 
   return (
@@ -215,11 +231,11 @@ function ChatMessage({
           {content}
         </ReactMarkdown>
       </div>
-      {!isAIMessage && user?.imageUrl && (
+      {!isAIMessage && userAvatar && (
         <div className="ml-2 flex-shrink-0">
           <Image
-            src={user.imageUrl}
-            alt="user image"
+            src={userAvatar}
+            alt="user avatar"
             width={32}
             height={32}
             className="rounded-full object-cover"

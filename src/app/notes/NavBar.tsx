@@ -3,14 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import logo from "@/assets/logo.png";
-import { UserButton, currentUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import AddNoteDialog from "@/components/AddEditNoteDialog";
 import ThemeToggleButton from "@/components/ThemeToggleButton";
-import { dark } from "@clerk/themes";
 import { useTheme } from "next-themes";
+import { UserButton } from "@/components/UserButton"; // Import the new UserButton component
 import {
   Sheet,
   SheetContent,
@@ -21,7 +20,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-export default function NavBar({ user }: { user: string }) {
+export default function NavBar({ user }: { user: any }) {
   const { theme } = useTheme();
 
   const [showAddNoteDialog, setShowAddNoteDialog] = useState(false);
@@ -40,12 +39,7 @@ export default function NavBar({ user }: { user: string }) {
 
   return (
     <>
-      <div
-        className="p-4 shadow-sm"
-        style={{
-          boxSizing: "border-box",
-        }}
-      >
+      <div className="p-4 shadow-sm" style={{ boxSizing: "border-box" }}>
         <div className="m-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
           <Link href={"/notes"} className="flex items-center gap-1">
             <Image src={logo} alt="9 notes logo" width={40} height={40} />
@@ -88,19 +82,7 @@ export default function NavBar({ user }: { user: string }) {
                 </SheetHeader>
                 <div className="items flex flex-col justify-end gap-5 py-5">
                   <div className="mr-3 flex items-center justify-end gap-3">
-                    <span className="text-right text-sm">{user}</span>
-                    <UserButton
-                      afterSignOutUrl="/"
-                      appearance={{
-                        baseTheme: theme === "dark" ? dark : undefined,
-                        elements: {
-                          avatarBox: {
-                            width: "2.5rem",
-                            height: "2.5rem",
-                          },
-                        },
-                      }}
-                    />
+                    <UserButton user={user} />
                   </div>
                   <div className="mr-3 flex items-center justify-end gap-3">
                     <span className="text-sm">Change theme</span>
@@ -131,18 +113,7 @@ export default function NavBar({ user }: { user: string }) {
             </Sheet>
           ) : (
             <div className="flex items-center gap-4">
-              <UserButton
-                afterSignOutUrl="/"
-                appearance={{
-                  baseTheme: theme === "dark" ? dark : undefined,
-                  elements: {
-                    avatarBox: {
-                      width: "2.5rem",
-                      height: "2.5rem",
-                    },
-                  },
-                }}
-              />
+              <UserButton user={user} />
               <ThemeToggleButton />
               <Button onClick={() => setShowAddNoteDialog(true)}>
                 <Plus size={16} className="mr-2" />

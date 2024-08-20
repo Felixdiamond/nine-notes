@@ -16,14 +16,25 @@ export async function GET(req: Request) {
         const limit = parseInt(url.searchParams.get('limit') || '10');
         const skip = (page - 1) * limit;
 
-        const notes = await prisma.note.findMany({
-            where: { userId },
-            orderBy: { updatedAt: 'desc' },
-            take: limit,
-            skip: skip
-        });
-
-        const totalCount = await prisma.note.count({ where: { userId } });
+        const [notes, totalCount] = await prisma.$transaction([
+            prisma.note.findMany({
+                where: { userId },
+                orderBy: { updatedAt: 'desc' },
+                take: limit,
+                skip: skip,
+                cacheStrategy: {
+                    ttl: 60,
+                    swr: 60
+                }
+            }),
+            prisma.note.count({
+                where: { userId },
+                cacheStrategy: {
+                    ttl: 300,
+                    swr: 60
+                }
+            })
+        ]);
 
         return Response.json({
             notes,
