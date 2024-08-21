@@ -3,7 +3,6 @@ import logo from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRightIcon } from "lucide-react";
-import { redirect } from "next/navigation";
 
 export default function Home() {
   return (

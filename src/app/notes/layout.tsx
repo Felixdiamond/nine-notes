@@ -1,6 +1,4 @@
 "use client";
-
-import { useUser } from "@supabase/auth-helpers-react";
 import NavBar from "./NavBar";
 import { Suspense, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
