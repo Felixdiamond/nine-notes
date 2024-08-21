@@ -5,12 +5,11 @@ import { NextResponse } from 'next/server'
 export async function POST(req: Request) {
   const body = await req.json()
   const { email, password, image } = body
-
   const supabase = createRouteHandlerClient({ cookies })
 
   try {
     // Create the user
-    const { data: user, error: signUpError } = await supabase.auth.signUp({
+    const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
     })
@@ -19,11 +18,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: signUpError.message }, { status: 400 })
     }
 
+    if (!data.user) {
+      return NextResponse.json({ error: 'User creation failed' }, { status: 400 })
+    }
+
     // Upload the profile image, if provided
     if (image) {
       const { data: imageData, error: imageError } = await supabase.storage
         .from('avatars')
-        .upload(`${user.id}/avatar`, image, {
+        .upload(`${data.user.id}/avatar`, image, {
           cacheControl: '3600',
           upsert: true,
         })
