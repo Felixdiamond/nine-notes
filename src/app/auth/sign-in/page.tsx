@@ -71,6 +71,9 @@ const SignInPage = () => {
           redirectTo: `${window.location.origin}/notes`,
         }
       })
+      console.log("Sign In with google successful");
+      router.refresh();
+      router.push('/notes');
     } catch (error) {
       console.error('Google sign-up error:', error)
       toast({
