@@ -25,19 +25,15 @@ const ProfilePage: React.FC = () => {
   const [error, setError] = useState<string>('');
   const supabase = createBrowserClient();
   const { toast } = useToast();
+  const { user: authUser } = useAuth();
 
   useEffect(() => {
-    fetchUserData();
-  }, []);
-
-  const fetchUserData = async () => {
-    const { user } = useAuth();
-    if (user) {
-      setUser(user);
-      setName((user.user_metadata as UserMetadata).name || '');
-      setAvatar((user.user_metadata as UserMetadata).avatar_url || null);
+    if (authUser) {
+      setUser(authUser);
+      setName((authUser.user_metadata as UserMetadata).name || '');
+      setAvatar((authUser.user_metadata as UserMetadata).avatar_url || null);
     }
-  };
+  }, [authUser]);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value);
 

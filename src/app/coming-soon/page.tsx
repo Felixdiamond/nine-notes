@@ -12,7 +12,7 @@ const ComingSoonPage = () => {
         </CardHeader>
         <CardContent>
           <p className="text-lg mb-8">
-            We're working hard to bring you something amazing. Stay tuned for updates!
+            We&apos;re working hard to bring you something amazing. Stay tuned for updates!
           </p>
           <Link href="/notes">
             <Button variant="outline" className="w-full">

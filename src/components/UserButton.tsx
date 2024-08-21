@@ -20,15 +20,10 @@ interface UserButtonProps {
       avatar_url?: string;
       full_name?: string;
     };
-  };
+  } | null;
 }
 
 export function UserButton({ user }: UserButtonProps) {
-
-  if (!user) {
-    return null;
-  }
-
   const router = useRouter();
   const supabase = createClientComponentClient<Database>();
   const [isOpen, setIsOpen] = useState(false);
@@ -38,11 +33,15 @@ export function UserButton({ user }: UserButtonProps) {
     router.push("/");
   };
 
+  if (!user) {
+    return null;
+  }
+
   const userInitials = user.user_metadata?.full_name
     ? user.user_metadata.full_name.split(' ').map(n => n[0]).join('').toUpperCase()
     : user.email
-    ? user.email[0].toUpperCase()
-    : 'U';
+      ? user.email[0].toUpperCase()
+      : 'U';
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
