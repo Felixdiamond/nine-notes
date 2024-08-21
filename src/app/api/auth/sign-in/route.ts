@@ -1,27 +1,34 @@
-import { supabase } from "@/lib/supabase";
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
-    try {
-        const body = await req.json();
-        const { email, password } = body;
+  const body = await req.json()
+  const { email, password } = body
 
-        if (!email || !password) {
-            return Response.json({ error: "Email and password are required" }, { status: 400 });
-        }
+  const supabase = createRouteHandlerClient({ cookies })
 
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
+  try {
+    const { data: user, error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
 
-        if (error) {
-            return Response.json({ error: error.message }, { status: 400 });
-        }
-
-        return Response.json({ data }, { status: 200 });
+    if (signInError && signInError.message.includes('User has signed up with Google')) {
+      return NextResponse.json(
+        { error: 'You signed up with Google. Please sign in with Google.' },
+        { status: 400 }
+      )
+    } else if (signInError) {
+      return NextResponse.json({ error: signInError.message }, { status: 400 })
     }
-    catch (error) {
-        console.error(error);
-        return Response.json({ error: "An unexpected error occurred" }, { status: 500 });
-    }
+
+    await supabase.auth.refreshSession()
+    return NextResponse.json({ message: 'Sign in successful' }, { status: 200 })
+  } catch (error) {
+    console.error('Sign in error:', error)
+    return NextResponse.json({ error: 'An error occurred during sign in' }, { status: 500 })
+  }
 }
+
+export const dynamic = 'force-dynamic'

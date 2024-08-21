@@ -1,7 +1,7 @@
 // contexts/NotesContext.tsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Note } from "@prisma/client";
-import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import { useAuth } from "./AuthContext";
 
 interface NotesContextType {
   notes: Note[];
@@ -24,7 +24,7 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const user = useUser();
+  const { user } = useAuth();
 
   useEffect(() => {
     if (user) fetchNotes();

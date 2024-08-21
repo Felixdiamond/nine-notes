@@ -1,9 +1,11 @@
+import { Database } from "@/lib/database.types";
 import { notesIndex } from "@/lib/db/pinecone";
 import prisma from "@/lib/db/prisma";
 import { getEmbedding } from "@/lib/gemini";
-import { auth } from "@clerk/nextjs";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { GoogleGenerativeAIStream, Message, StreamingTextResponse } from "ai";
+import { cookies } from "next/headers";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_SECRET_KEY || "");
 
@@ -22,7 +24,11 @@ export async function POST(req: Request) {
     );
 
     // Get the user ID
-    const { userId } = auth();
+    const supabase = createServerComponentClient<Database>({ cookies });
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    const userId = session?.user?.id;
 
     // Query the Pinecone index with the generated embedding
     const vectorQueryResponse = await notesIndex.query({

@@ -4,9 +4,9 @@ import "./globals.css";
 import { ThemeProvider } from "./ThemeProvider";
 import ClientNotesProvider from "@/components/ClientNotesProvider";
 import { Toaster } from "@/components/ui/toaster";
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
-import { headers, cookies } from 'next/headers';
-import { Database } from '@/lib/database.types';
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,19 +21,18 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = createServerComponentClient<Database>({ cookies });
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const supabase = createServerComponentClient({ cookies })
+  const { data: { session } } = await supabase.auth.getSession()
 
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ClientNotesProvider session={session}>
+        <AuthProvider serverSession={session}>
+        <ClientNotesProvider>
           <ThemeProvider attribute="class">{children}</ThemeProvider>
           <Toaster />
         </ClientNotesProvider>
+        </AuthProvider>
       </body>
     </html>
   );

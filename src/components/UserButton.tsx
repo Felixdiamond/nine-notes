@@ -24,6 +24,11 @@ interface UserButtonProps {
 }
 
 export function UserButton({ user }: UserButtonProps) {
+
+  if (!user) {
+    return null;
+  }
+
   const router = useRouter();
   const supabase = createClientComponentClient<Database>();
   const [isOpen, setIsOpen] = useState(false);
@@ -58,7 +63,7 @@ export function UserButton({ user }: UserButtonProps) {
         <DropdownMenuItem onClick={() => router.push('/profile')}>
           Profile
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push('/settings')}>
+        <DropdownMenuItem onClick={() => router.push('/coming-soon')}>
           Settings
         </DropdownMenuItem>
         <DropdownMenuSeparator />

@@ -1,12 +1,19 @@
+import { Database } from "@/lib/database.types";
 import { notesIndex } from "@/lib/db/pinecone";
 import prisma from "@/lib/db/prisma";
 import { getEmbedding } from "@/lib/gemini";
 import { createNoteSchema, deleteNoteSchema, updateNoteSchema } from "@/lib/validation/note";
-import { auth } from "@clerk/nextjs";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from 'next/headers'
+
 
 export async function GET(req: Request) {
+    console.log("Making get request to notes api");
     try {
-        const { userId } = auth();
+        const supabase = createServerComponentClient<Database>({ cookies })
+        const { data: { session } } = await supabase.auth.getSession()
+        const userId = session?.user?.id;
+        
         if (!userId) {
             return Response.json({ error: "Unauthorized" }, { status: 401 })
         }
@@ -61,7 +68,9 @@ export async function POST(req: Request) {
 
         const { title, content } = parseResult.data;
 
-        const { userId } = auth();
+        const supabase = createServerComponentClient<Database>({ cookies })
+        const { data: { session } } = await supabase.auth.getSession()
+        const userId = session?.user?.id;
 
         if (!userId) {
             return Response.json({ error: "Unauthorized" }, { status: 401 })
@@ -115,7 +124,9 @@ export async function PUT(req: Request) {
             return Response.json({ error: "Note not found" }, { status: 404 })
         }
 
-        const { userId } = auth();
+        const supabase = createServerComponentClient<Database>({ cookies })
+        const { data: { session } } = await supabase.auth.getSession()
+        const userId = session?.user?.id;
 
         if (!userId || userId !== note.userId) {
             return Response.json({ error: "Unauthorized" }, { status: 401 })
@@ -169,7 +180,9 @@ export async function DELETE(req: Request) {
             return Response.json({ error: "Note not found" }, { status: 404 })
         }
 
-        const { userId } = auth();
+        const supabase = createServerComponentClient<Database>({ cookies })
+        const { data: { session } } = await supabase.auth.getSession()
+        const userId = session?.user?.id;
 
         if (!userId || userId !== note.userId) {
             return Response.json({ error: "Unauthorized" }, { status: 401 })

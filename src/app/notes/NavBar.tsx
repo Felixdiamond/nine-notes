@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import AddNoteDialog from "@/components/AddEditNoteDialog";
 import ThemeToggleButton from "@/components/ThemeToggleButton";
 import { useTheme } from "next-themes";
-import { UserButton } from "@/components/UserButton"; // Import the new UserButton component
+import { UserButton } from "@/components/UserButton";
 import {
   Sheet,
   SheetContent,
@@ -82,6 +82,15 @@ export default function NavBar({ user }: { user: any }) {
                 </SheetHeader>
                 <div className="items flex flex-col justify-end gap-5 py-5">
                   <div className="mr-3 flex items-center justify-end gap-3">
+                    <span className="text-sm">
+                    {user.user_metadata?.full_name
+                      ? user.user_metadata.full_name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase()
+                      : user.email}
+                      </span>
                     <UserButton user={user} />
                   </div>
                   <div className="mr-3 flex items-center justify-end gap-3">

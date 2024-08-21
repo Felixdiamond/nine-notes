@@ -10,12 +10,15 @@ import { AlertCircle, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from 'next/link';
 import { useToast } from '@/components/ui/use-toast';
+import { createBrowserClient } from '@/lib/supabase';
+import { FaGoogle } from 'react-icons/fa';
 
 const SignInPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -39,6 +42,9 @@ const SignInPage = () => {
           title: "Sign In successful",
           description: "You have successfully signed in",
         });
+        router.refresh();
+        router.push('/notes');
+        router.refresh();
       } else {
         throw new Error(data.error || "Sign In failed");
       }
@@ -54,6 +60,23 @@ const SignInPage = () => {
     }
   };
 
+  const handleGoogleSignUp = async () => {
+    setGoogleLoading(true);
+
+    const supabase = createBrowserClient();
+    try {
+      await supabase.auth.signInWithOAuth({
+        provider: 'google',
+      })
+    } catch (error) {
+      console.error('Google sign-up error:', error)
+      toast({
+        title: "An error occurred",
+        description: "An error occurred during Google sign-in",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center">
       <Card className="w-full max-w-md">
@@ -61,6 +84,31 @@ const SignInPage = () => {
           <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
         </CardHeader>
         <CardContent>
+        <div>
+            <Button
+              variant="outline"
+              className="flex w-full items-center justify-center"
+              disabled={googleLoading}
+              onClick={handleGoogleSignUp}
+            >
+              {googleLoading ? (
+                <>
+                  <Loader2 className="mr-3 h-4 w-4 animate-spin" />
+                  Sign In with Google
+                </>
+              ) : (
+                <>
+                  <FaGoogle className="mr-3" />
+                  Sign In with Google
+                </>
+              )}
+            </Button>
+          </div>
+          <div className="mb-4 mt-4 flex items-center justify-center space-x-3">
+            <hr className="w-full" />
+            <p className="text-center">or</p>
+            <hr className="w-full" />
+          </div>
           <form onSubmit={handleSignUp} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>

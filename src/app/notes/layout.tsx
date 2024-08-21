@@ -1,35 +1,58 @@
+"use client";
+
 import { useUser } from "@supabase/auth-helpers-react";
 import NavBar from "./NavBar";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Inline SVG loader component
 function Loader({ isDark = false }: { isDark?: boolean }) {
   const color = isDark ? "#616161" : "#9CA3AF";
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
-      <g>
-        <circle fill={color} r="4" cy="50">
-          <animate attributeName="cx" repeatCount="indefinite" dur="1s" keyTimes="0;1" values="95;35" begin="-0.67s"/>
-          <animate attributeName="fill-opacity" repeatCount="indefinite" dur="1s" keyTimes="0;0.2;1" values="0;1;1" begin="-0.67s"/>
-        </circle>
-        <circle fill={color} r="4" cy="50">
-          <animate attributeName="cx" repeatCount="indefinite" dur="1s" keyTimes="0;1" values="95;35" begin="-0.33s"/>
-          <animate attributeName="fill-opacity" repeatCount="indefinite" dur="1s" keyTimes="0;0.2;1" values="0;1;1" begin="-0.33s"/>
-        </circle>
-        <circle fill={color} r="4" cy="50">
-          <animate attributeName="cx" repeatCount="indefinite" dur="1s" keyTimes="0;1" values="95;35" begin="0s"/>
-          <animate attributeName="fill-opacity" repeatCount="indefinite" dur="1s" keyTimes="0;0.2;1" values="0;1;1" begin="0s"/>
-        </circle>
-      </g>
-      <g transform="translate(-15 0)">
-        <path transform="rotate(90 50 50)" fill={color} d="M50 50L20 50A30 30 0 0 0 80 50Z"/>
-        <path fill={color} d="M50 50L20 50A30 30 0 0 0 80 50Z">
-          <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" keyTimes="0;0.5;1" values="0 50 50;45 50 50;0 50 50"/>
-        </path>
-        <path fill={color} d="M50 50L20 50A30 30 0 0 1 80 50Z">
-          <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" keyTimes="0;0.5;1" values="0 50 50;-45 50 50;0 50 50"/>
-        </path>
-      </g>
+    <svg
+      version="1.1"
+      id="L9"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlnsXlink="http://www.w3.org/1999/xlink"
+      x="0px"
+      y="0px"
+      viewBox="0 0 100 100"
+      enableBackground="new 0 0 0 0"
+      xmlSpace="preserve"
+    >
+      <rect x="20" y="50" width="4" height="10" fill={color}>
+        <animateTransform
+          attributeType="xml"
+          attributeName="transform"
+          type="translate"
+          values="0 0; 0 20; 0 0"
+          begin="0"
+          dur="0.6s"
+          repeatCount="indefinite"
+        />
+      </rect>
+      <rect x="30" y="50" width="4" height="10" fill={color}>
+        <animateTransform
+          attributeType="xml"
+          attributeName="transform"
+          type="translate"
+          values="0 0; 0 20; 0 0"
+          begin="0.2s"
+          dur="0.6s"
+          repeatCount="indefinite"
+        />
+      </rect>
+      <rect x="40" y="50" width="4" height="10" fill={color}>
+        <animateTransform
+          attributeType="xml"
+          attributeName="transform"
+          type="translate"
+          values="0 0; 0 20; 0 0"
+          begin="0.4s"
+          dur="0.6s"
+          repeatCount="indefinite"
+        />
+      </rect>
     </svg>
   );
 }
@@ -45,24 +68,11 @@ function Loading() {
 
 // Async component to fetch user data
 async function UserData() {
-  let infopassed: string = "Guest";
-  try {
-    const user = useUser();
-    if (user) {
-      if (user.firstName) {
-        infopassed = `${user.firstName} ${user.lastName || ""}`.trim();
-      } else if (user.emailAddresses && user.emailAddresses.length > 0) {
-        infopassed = user.emailAddresses[0].emailAddress;
-      }
-    }
-  } catch (error) {
-    console.error("Error fetching user:", error);
-  }
-  return <NavBar user={infopassed} />;
+  const { user, isLoading } = useAuth();
+  return <NavBar user={user} />;
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  console.log("children", children);
   return (
     <>
       <Suspense fallback={<Loading />}>

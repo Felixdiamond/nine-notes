@@ -19,11 +19,13 @@ interface NoteProps {
 
 export default function Note({ note }: NoteProps) {
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const wasUpdated = note.updatedAt > note.createdAt;
-  const timeAgo = formatDistanceToNow(
-    wasUpdated ? note.updatedAt : note.createdAt,
-    { addSuffix: true },
-  );
+  const wasUpdated =
+    note.updatedAt && note.createdAt && note.updatedAt > note.createdAt;
+  const timeAgo = wasUpdated
+    ? formatDistanceToNow(note.updatedAt, { addSuffix: true })
+    : note.createdAt
+      ? formatDistanceToNow(note.createdAt, { addSuffix: true })
+      : "Just now";
 
   return (
     <>
@@ -37,8 +39,8 @@ export default function Note({ note }: NoteProps) {
           </CardTitle>
           <CardDescription className="text-sm text-gray-700 dark:text-gray-200">
             <div className="flex">
-            {timeAgo}
-            {wasUpdated && <Dot />}
+              {timeAgo}
+              {wasUpdated && <Dot />}
             </div>
           </CardDescription>
         </CardHeader>

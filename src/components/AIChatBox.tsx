@@ -5,13 +5,13 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Message } from "ai";
 import Image from "next/image";
-import { useEffect, useRef, KeyboardEvent } from "react";
+import { useEffect, useRef, KeyboardEvent, useState } from "react";
 import "./AIChatBox.css";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
-import { Database } from '@/lib/database.types';
+import { useAuth } from "@/contexts/AuthContext";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 interface AIChatBoxProps {
   open: boolean;
@@ -30,7 +30,6 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
   } = useChat();
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const supabase = useSupabaseClient<Database>();
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -189,12 +188,16 @@ function ChatMessage({
 }: {
   message: Pick<Message, "role" | "content"> & { id?: string | undefined };
 }) {
-  const supabase = useSupabaseClient<Database>();
-  const [userAvatar, setUserAvatar] = useState<string | null>(null);
+  const { user } = useAuth();
+  const userInitials = user?.user_metadata?.full_name
+    ? user?.user_metadata.full_name.split(' ').map(n => n[0]).join('').toUpperCase()
+    : user?.email
+    ? user?.email[0].toUpperCase()
+    : 'U';
+  const [userAvatar, setUserAvatar] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     async function fetchUserAvatar() {
-      const { data: { user } } = await supabase.auth.getUser();
       if (user?.user_metadata?.avatar_url) {
         setUserAvatar(user.user_metadata.avatar_url);
       }
@@ -202,7 +205,7 @@ function ChatMessage({
     if (role === "user") {
       fetchUserAvatar();
     }
-  }, [role, supabase.auth]);
+  }, [role]);
 
   const isAIMessage = role === "assistant";
 
@@ -215,7 +218,11 @@ function ChatMessage({
     >
       {isAIMessage && (
         <div className="mr-2 flex-shrink-0">
-          <BotIcon className="h-8 w-8 text-blue-500" />
+          <Avatar>
+            <AvatarFallback>
+              AI
+            </AvatarFallback>
+          </Avatar>
         </div>
       )}
       <div
@@ -231,15 +238,12 @@ function ChatMessage({
           {content}
         </ReactMarkdown>
       </div>
-      {!isAIMessage && userAvatar && (
+      {!isAIMessage  && (
         <div className="ml-2 flex-shrink-0">
-          <Image
-            src={userAvatar}
-            alt="user avatar"
-            width={32}
-            height={32}
-            className="rounded-full object-cover"
-          />
+          <Avatar>
+            <AvatarImage src={userAvatar} />
+            <AvatarFallback>{userInitials}</AvatarFallback>
+          </Avatar>
         </div>
       )}
     </div>
