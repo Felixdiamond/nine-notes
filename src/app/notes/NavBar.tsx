@@ -85,10 +85,6 @@ export default function NavBar({ user }: { user: any }) {
                     <span className="text-sm">
                     {user.user_metadata?.full_name
                       ? user.user_metadata.full_name
-                          .split(" ")
-                          .map((n: [string]) => n[0])
-                          .join("")
-                          .toUpperCase()
                       : user.email}
                       </span>
                     <UserButton user={user} />
