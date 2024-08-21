@@ -13,8 +13,14 @@ export async function middleware(req: NextRequest) {
 
   // Check if the current path is not in the list of public routes
   if (!publicRoutes.includes(req.nextUrl.pathname)) {
+    // If the request is for an API route, don't redirect
+    if (req.nextUrl.pathname.startsWith('/api/')) {
+      return res
+    }
+
     // If there's no session, redirect to the sign-in page
     if (!session) {
+      console.log('No session found, redirecting to sign-in page')
       return NextResponse.redirect(new URL('/auth/sign-in', req.url))
     }
   }
