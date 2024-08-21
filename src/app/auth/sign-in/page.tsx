@@ -48,7 +48,7 @@ const SignInPage = () => {
       } else {
         throw new Error(data.error || "Sign In failed");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Sign In error:", error);
       setError(error.message);
       toast({

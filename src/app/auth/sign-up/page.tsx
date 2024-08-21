@@ -56,7 +56,7 @@ const SignUpPage = () => {
       } else {
         throw new Error(data.error || "Sign Up failed");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Sign Up error:", error);
       setError(error.message);
       toast({

@@ -190,7 +190,7 @@ function ChatMessage({
 }) {
   const { user } = useAuth();
   const userInitials = user?.user_metadata?.full_name
-    ? user?.user_metadata.full_name.split(' ').map(n => n[0]).join('').toUpperCase()
+    ? user?.user_metadata.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
     : user?.email
     ? user?.email[0].toUpperCase()
     : 'U';
