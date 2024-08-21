@@ -67,6 +67,9 @@ const SignInPage = () => {
     try {
       await supabase.auth.signInWithOAuth({
         provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/notes`,
+        }
       })
     } catch (error) {
       console.error('Google sign-up error:', error)
