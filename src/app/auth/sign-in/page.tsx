@@ -1,41 +1,48 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import Link from 'next/link';
-import { useToast } from '@/components/ui/use-toast';
-import { createBrowserClient } from '@/lib/supabase';
-import { FaGoogle } from 'react-icons/fa';
+import Link from "next/link";
+import { useToast } from "@/components/ui/use-toast";
+import { createBrowserClient } from "@/lib/supabase";
+import { FaGoogle } from "react-icons/fa";
 
 const SignInPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
+  // useEffect(() => {
+  //   return () => {
+  //     console.log("Sign In page unmounted");
+  //     setGoogleLoading(false);
+  //   };
+  // }, []);
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-  
+    setError("");
+
     try {
-      const response = await fetch('/api/auth/sign-in', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/auth/sign-in", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         console.log("Sign In successful");
         toast({
@@ -43,7 +50,7 @@ const SignInPage = () => {
           description: "You have successfully signed in",
         });
         router.refresh();
-        router.push('/notes');
+        router.push("/notes");
         router.refresh();
       } else {
         throw new Error(data.error || "Sign In failed");
@@ -62,24 +69,26 @@ const SignInPage = () => {
 
   const handleGoogleSignUp = async () => {
     setGoogleLoading(true);
-  
+    setError("");
+
     const supabase = createBrowserClient();
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
-        }
+        },
       });
-  
+
       if (error) throw error;
-  
+
       // The user will be redirected to Google's login page
     } catch (error: any) {
-      console.error('Google sign-up error:', error);
+      console.error("Google sign-up error:", error);
+      setError(error.message || "An error occurred during Google sign-in");
       toast({
         title: "An error occurred",
-        description: "An error occurred during Google sign-in",
+        description: error.message || "An error occurred during Google sign-in",
       });
     } finally {
       setGoogleLoading(false);
@@ -87,13 +96,15 @@ const SignInPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="flex min-h-screen items-center justify-center">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
+          <CardTitle className="text-center text-2xl font-bold">
+            Sign In
+          </CardTitle>
         </CardHeader>
         <CardContent>
-        <div>
+          <div>
             <Button
               variant="outline"
               className="flex w-full items-center justify-center"
@@ -102,12 +113,12 @@ const SignInPage = () => {
             >
               {googleLoading ? (
                 <>
-                  <Loader2 className="mr-3 h-4 w-4 animate-spin" />
-                  Sign In with Google
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing in with Google...
                 </>
               ) : (
                 <>
-                  <FaGoogle className="mr-3" />
+                  <FaGoogle className="mr-2" />
                   Sign In with Google
                 </>
               )}
@@ -154,12 +165,21 @@ const SignInPage = () => {
                   Please wait
                 </>
               ) : (
-                'Sign In'
+                "Sign In"
               )}
             </Button>
           </form>
-          <div className="text-center mt-4">
-            <span>Don&apos;t have an account yet? <Link href="/auth/sign-up" className="text-blue-500 font-semibold" prefetch>Sign Up</Link></span>
+          <div className="mt-4 text-center">
+            <span>
+              Don&apos;t have an account yet?{" "}
+              <Link
+                href="/auth/sign-up"
+                className="font-semibold text-blue-500"
+                prefetch
+              >
+                Sign Up
+              </Link>
+            </span>
           </div>
         </CardContent>
       </Card>
