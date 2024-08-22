@@ -11,6 +11,7 @@ import AddNoteDialog from "./AddEditNoteDialog";
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { Dot } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 interface NoteProps {
   note: NoteModel;
@@ -26,12 +27,13 @@ export default function Note({ note }: NoteProps) {
   const hasCreatedAt = Boolean(note.createdAt);
 
   // Handle timestamp formatting
-  const wasUpdated = hasUpdatedAt && hasCreatedAt && note.updatedAt > note.createdAt;
+  const wasUpdated =
+    hasUpdatedAt && hasCreatedAt && note.updatedAt > note.createdAt;
   const timeAgo = wasUpdated
     ? formatDistanceToNow(note.updatedAt, { addSuffix: true })
     : hasCreatedAt
-    ? formatDistanceToNow(note.createdAt, { addSuffix: true })
-    : "Just now";
+      ? formatDistanceToNow(note.createdAt, { addSuffix: true })
+      : "Just now";
 
   return (
     <>
@@ -52,7 +54,9 @@ export default function Note({ note }: NoteProps) {
         </CardHeader>
         <CardContent className="mt-4">
           <div className="line-clamp-3 whitespace-pre-line text-gray-600 sm:text-sm">
-            {hasContent ? note.content : "No content"}
+            <ReactMarkdown>
+              {hasContent ? note.content : "No content"}
+            </ReactMarkdown>
           </div>
         </CardContent>
       </Card>
