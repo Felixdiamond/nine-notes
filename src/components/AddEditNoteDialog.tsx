@@ -20,7 +20,7 @@ import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import LoadingButton from "./ui/loading-button";
 import { Note } from "@prisma/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNotes } from "@/contexts/NotesContext";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
@@ -40,6 +40,7 @@ export default function AddNoteDialog({
   const [deletionInProgress, setDeletionInProgress] = useState(false);
   const { addNote, updateNote, deleteNote } = useNotes();
   const { toast } = useToast();
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
   const router = useRouter();
 
   const form = useForm<CreateNoteSchema>({
@@ -49,6 +50,16 @@ export default function AddNoteDialog({
       content: noteToEdit?.content || "",
     },
   });
+
+  useEffect(() => {
+    function handleResize() {
+      setIsMobile(window.innerWidth < 640);
+    }
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   async function onSubmit(input: CreateNoteSchema) {
     try {
@@ -145,7 +156,9 @@ export default function AddNoteDialog({
                 className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
               >
                 <Maximize2 size={20} />
-                Full Screen
+                {
+                  isMobile ? "" : "Full Screen"
+                }
               </button>
               <div className="flex gap-4">
                 {noteToEdit && (
