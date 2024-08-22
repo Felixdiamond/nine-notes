@@ -83,6 +83,25 @@ const ProfilePage: React.FC = () => {
         const fileExt = file.name.split('.').pop();
         const fileName = `${user.id}/avatar-${Date.now()}.${fileExt}`;
 
+        // Attempt to delete the old avatar
+        if (avatarUrl) {
+          const oldFileName = avatarUrl.split('/').pop();
+          try {
+            const { error: deleteError } = await supabase.storage
+              .from("avatars")
+              .remove([`${user.id}/${oldFileName}`]);
+
+            if (deleteError) {
+              console.warn("Failed to delete old avatar:", deleteError.message);
+            } else {
+              console.log("Old avatar deleted successfully");
+            }
+          } catch (deleteError) {
+            console.warn("Error during old avatar deletion:", deleteError);
+          }
+        }
+
+        // Upload the new avatar
         const { data, error } = await supabase.storage
           .from("avatars")
           .upload(fileName, file, { upsert: true });
@@ -113,7 +132,7 @@ const ProfilePage: React.FC = () => {
         console.log("Profile updated:", data.user);
         toast({
           title: "Profile updated",
-          description: "Your profile has been successfully updated. You may need to sign in again to see the changes.",
+          description: "Your profile has been successfully updated.",
         });
       }
     } catch (error) {
