@@ -25,7 +25,6 @@ const SignUpPage = () => {
   const [image, setImage] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -69,18 +68,26 @@ const SignUpPage = () => {
   };
 
   const handleGoogleSignUp = async () => {
-    setGoogleLoading(true);
+    setError("");
 
     const supabase = createBrowserClient();
     try {
-      await supabase.auth.signInWithOAuth({
-        provider: 'google',
-      })
-    } catch (error) {
-      console.error('Google sign-up error:', error)
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) throw error;
+
+      // The user will be redirected to Google's login page
+    } catch (error: any) {
+      console.error("Google sign-up error:", error);
+      setError(error.message || "An error occurred during Google sign-in");
       toast({
         title: "An error occurred",
-        description: "An error occurred during Google sign-up",
+        description: error.message || "An error occurred during Google sign-in",
       });
     }
   };
@@ -101,20 +108,10 @@ const SignUpPage = () => {
             <Button
               variant="outline"
               className="flex w-full items-center justify-center"
-              disabled={googleLoading}
               onClick={handleGoogleSignUp}
             >
-              {googleLoading ? (
-                <>
-                  <Loader2 className="mr-3 h-4 w-4 animate-spin" />
-                  Sign Up with Google
-                </>
-              ) : (
-                <>
                   <FaGoogle className="mr-3" />
                   Sign Up with Google
-                </>
-              )}
             </Button>
           </div>
           <div className="mb-4 mt-4 flex items-center justify-center space-x-3">

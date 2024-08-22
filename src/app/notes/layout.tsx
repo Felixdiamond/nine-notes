@@ -7,50 +7,61 @@ import { useAuth } from "@/contexts/AuthContext";
 function Loader({ isDark = false }: { isDark?: boolean }) {
   const color = isDark ? "#616161" : "#9CA3AF";
   return (
-    <svg
-      version="1.1"
-      id="L9"
-      xmlns="http://www.w3.org/2000/svg"
-      xmlnsXlink="http://www.w3.org/1999/xlink"
-      x="0px"
-      y="0px"
-      viewBox="0 0 100 100"
-      enableBackground="new 0 0 0 0"
-      xmlSpace="preserve"
-    >
-      <rect x="20" y="50" width="4" height="10" fill={color}>
-        <animateTransform
-          attributeType="xml"
-          attributeName="transform"
-          type="translate"
-          values="0 0; 0 20; 0 0"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" className="w-6 h-6">
+      <circle
+        fill={color}
+        stroke={color}
+        stroke-width="15"
+        r="15"
+        cx="40"
+        cy="65"
+      >
+        <animate
+          attributeName="cy"
+          calcMode="spline"
+          dur="2"
+          values="65;135;65;"
+          keySplines=".5 0 .5 1;.5 0 .5 1"
+          repeatCount="indefinite"
+          begin="-.4"
+        ></animate>
+      </circle>
+      <circle
+        fill={color}
+        stroke={color}
+        stroke-width="15"
+        r="15"
+        cx="100"
+        cy="65"
+      >
+        <animate
+          attributeName="cy"
+          calcMode="spline"
+          dur="2"
+          values="65;135;65;"
+          keySplines=".5 0 .5 1;.5 0 .5 1"
+          repeatCount="indefinite"
+          begin="-.2"
+        ></animate>
+      </circle>
+      <circle
+        fill={color}
+        stroke={color}
+        stroke-width="15"
+        r="15"
+        cx="160"
+        cy="65"
+      >
+        <animate
+          attributeName="cy"
+          calcMode="spline"
+          dur="2"
+          values="65;135;65;"
+          keySplines=".5 0 .5 1;.5 0 .5 1"
+          repeatCount="indefinite"
           begin="0"
-          dur="0.6s"
-          repeatCount="indefinite"
-        />
-      </rect>
-      <rect x="30" y="50" width="4" height="10" fill={color}>
-        <animateTransform
-          attributeType="xml"
-          attributeName="transform"
-          type="translate"
-          values="0 0; 0 20; 0 0"
-          begin="0.2s"
-          dur="0.6s"
-          repeatCount="indefinite"
-        />
-      </rect>
-      <rect x="40" y="50" width="4" height="10" fill={color}>
-        <animateTransform
-          attributeType="xml"
-          attributeName="transform"
-          type="translate"
-          values="0 0; 0 20; 0 0"
-          begin="0.4s"
-          dur="0.6s"
-          repeatCount="indefinite"
-        />
-      </rect>
+        ></animate>
+      </circle>
     </svg>
   );
 }

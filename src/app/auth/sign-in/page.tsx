@@ -18,16 +18,8 @@ const SignInPage = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
-
-  // useEffect(() => {
-  //   return () => {
-  //     console.log("Sign In page unmounted");
-  //     setGoogleLoading(false);
-  //   };
-  // }, []);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,7 +60,6 @@ const SignInPage = () => {
   };
 
   const handleGoogleSignUp = async () => {
-    setGoogleLoading(true);
     setError("");
 
     const supabase = createBrowserClient();
@@ -90,8 +81,6 @@ const SignInPage = () => {
         title: "An error occurred",
         description: error.message || "An error occurred during Google sign-in",
       });
-    } finally {
-      setGoogleLoading(false);
     }
   };
 
@@ -108,20 +97,10 @@ const SignInPage = () => {
             <Button
               variant="outline"
               className="flex w-full items-center justify-center"
-              disabled={googleLoading}
               onClick={handleGoogleSignUp}
             >
-              {googleLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in with Google...
-                </>
-              ) : (
-                <>
                   <FaGoogle className="mr-2" />
                   Sign In with Google
-                </>
-              )}
             </Button>
           </div>
           <div className="mb-4 mt-4 flex items-center justify-center space-x-3">
