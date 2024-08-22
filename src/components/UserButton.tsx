@@ -30,6 +30,7 @@ export function UserButton({ user }: UserButtonProps) {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+    localStorage.removeItem('userLocation');
     router.push("/");
   };
 
