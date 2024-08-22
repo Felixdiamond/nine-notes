@@ -9,7 +9,7 @@ export async function middleware(req: NextRequest) {
   const { data: { session } } = await supabase.auth.getSession()
 
   // List of public routes
-  const publicRoutes = ['/', '/auth/sign-in', '/auth/sign-up']
+  const publicRoutes = ['/', '/auth/sign-in', '/auth/sign-up', '/auth/callback']
 
   // Check if the current path is not in the list of public routes
   if (!publicRoutes.includes(req.nextUrl.pathname)) {

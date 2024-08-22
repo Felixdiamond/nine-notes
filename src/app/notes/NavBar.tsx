@@ -83,9 +83,9 @@ export default function NavBar({ user }: { user: any }) {
                 <div className="items flex flex-col justify-end gap-5 py-5">
                   <div className="mr-3 flex items-center justify-end gap-3">
                     <span className="text-sm">
-                    {user.user_metadata?.full_name
-                      ? user.user_metadata.full_name
-                      : user.email}
+                    {user?.user_metadata?.full_name
+                      ? user?.user_metadata.full_name
+                      : user?.email}
                       </span>
                     <UserButton user={user} />
                   </div>

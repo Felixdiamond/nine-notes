@@ -26,6 +26,7 @@ const ProfilePage: React.FC = () => {
   const supabase = createBrowserClient();
   const { toast } = useToast();
   const { user: authUser } = useAuth();
+  console.log("authUser", authUser);
 
   useEffect(() => {
     if (authUser) {
@@ -57,6 +58,7 @@ const ProfilePage: React.FC = () => {
         avatar &&
         avatar !== (user.user_metadata as UserMetadata).avatar_url
       ) {
+        console.log("Uploading avatar...");
         const file = await fetch(avatar).then((res) => res.blob());
         const { data, error } = await supabase.storage
           .from("avatars")
@@ -71,6 +73,7 @@ const ProfilePage: React.FC = () => {
         avatarUrl = publicUrl;
       }
 
+      console.log("Updating user...");
       const { data, error } = await supabase.auth.updateUser({
         data: { name, avatar_url: avatarUrl },
       });
@@ -79,6 +82,7 @@ const ProfilePage: React.FC = () => {
 
       if (data.user) {
         setUser(data.user);
+        console.log("Profile updated:", data.user);
         toast({
           title: "Profile updated",
           description: "Your profile has been successfully updated.",
@@ -97,7 +101,7 @@ const ProfilePage: React.FC = () => {
   if (!user) return <div>Loading...</div>;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
+    <div className="flex min-h-screen items-center justify-center max-h-screen">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center text-2xl font-bold">

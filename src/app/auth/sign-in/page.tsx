@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -62,24 +62,27 @@ const SignInPage = () => {
 
   const handleGoogleSignUp = async () => {
     setGoogleLoading(true);
-
+  
     const supabase = createBrowserClient();
     try {
-      await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/notes`,
+          redirectTo: `${window.location.origin}/auth/callback`,
         }
-      })
-      console.log("Sign In with google successful");
-      router.refresh();
-      router.push('/notes');
-    } catch (error) {
-      console.error('Google sign-up error:', error)
+      });
+  
+      if (error) throw error;
+  
+      // The user will be redirected to Google's login page
+    } catch (error: any) {
+      console.error('Google sign-up error:', error);
       toast({
         title: "An error occurred",
         description: "An error occurred during Google sign-in",
       });
+    } finally {
+      setGoogleLoading(false);
     }
   };
 
