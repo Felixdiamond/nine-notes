@@ -1,5 +1,5 @@
+// Note.tsx
 "use client";
-
 import { Note as NoteModel } from "@prisma/client";
 import {
   Card,
@@ -19,13 +19,14 @@ interface NoteProps {
 
 export default function Note({ note }: NoteProps) {
   const [showEditDialog, setShowEditDialog] = useState(false);
+
   const wasUpdated =
     note.updatedAt && note.createdAt && note.updatedAt > note.createdAt;
   const timeAgo = wasUpdated
     ? formatDistanceToNow(note.updatedAt, { addSuffix: true })
     : note.createdAt
-      ? formatDistanceToNow(note.createdAt, { addSuffix: true })
-      : "Just now";
+    ? formatDistanceToNow(note.createdAt, { addSuffix: true })
+    : "Just now";
 
   return (
     <>

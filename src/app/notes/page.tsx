@@ -1,6 +1,5 @@
-// app/notes/page.tsx
+// page.tsx (app/notes/page.tsx)
 "use client";
-
 import { useNotes } from "@/contexts/NotesContext";
 import AddBtn from "@/components/AddBtn";
 import ChatManager from "@/components/ChatManager";

@@ -2,7 +2,12 @@ import { PrismaClient } from '@prisma/client/edge'
 import { withAccelerate } from '@prisma/extension-accelerate'
 
 const PrismaClientSingleton = () => {
-    return new PrismaClient().$extends(withAccelerate());
+    return new PrismaClient({
+        transactionOptions: {
+            timeout: 30000,
+            maxWait: 30000,
+        }
+    }).$extends(withAccelerate());
 };
 
 type PrismaClientSingleton = ReturnType<typeof PrismaClientSingleton>;

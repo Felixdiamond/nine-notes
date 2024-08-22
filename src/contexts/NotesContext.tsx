@@ -1,13 +1,14 @@
-// contexts/NotesContext.tsx
+// NotesContext.tsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Note } from "@prisma/client";
 import { useAuth } from "./AuthContext";
+import { CreateNoteSchema } from "@/lib/validation/note";
 
 interface NotesContextType {
   notes: Note[];
   setNotes: React.Dispatch<React.SetStateAction<Note[]>>;
-  addNote: (note: Note) => Promise<void>;
-  updateNote: (updatedNote: Note) => Promise<void>;
+  addNote: (note: CreateNoteSchema) => Promise<void>;
+  updateNote: (updatedNote: Partial<Note> & { id: string }) => Promise<void>;
   deleteNote: (id: string) => Promise<void>;
   loading: boolean;
   error: string | null;
@@ -57,9 +58,7 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const addNote = async (note: Note) => {
-    const optimisticNote = { ...note, id: Date.now().toString() };
-    setNotes((prevNotes) => [...prevNotes, optimisticNote]);
+  const addNote = async (note: CreateNoteSchema) => {
     try {
       const response = await fetch("/api/notes", {
         method: "POST",
@@ -67,24 +66,14 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify(note),
       });
       if (!response.ok) throw new Error("Failed to add note");
-      const savedNote = await response.json();
-      setNotes((prevNotes) =>
-        prevNotes.map((n) => (n.id === optimisticNote.id ? savedNote : n)),
-      );
+      const savedNote: Note = await response.json();
+      setNotes((prevNotes) => [savedNote, ...prevNotes]);
     } catch (err) {
-      setNotes((prevNotes) =>
-        prevNotes.filter((n) => n.id !== optimisticNote.id),
-      );
       throw err;
     }
   };
 
-  const updateNote = async (updatedNote: Note) => {
-    setNotes((prevNotes) =>
-      prevNotes.map((note) =>
-        note.id === updatedNote.id ? updatedNote : note,
-      ),
-    );
+  const updateNote = async (updatedNote: Partial<Note> & { id: string }) => {
     try {
       const response = await fetch("/api/notes", {
         method: "PUT",
@@ -92,23 +81,16 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify(updatedNote),
       });
       if (!response.ok) throw new Error("Failed to update note");
-      const savedNote = await response.json();
+      const savedNote: Note = await response.json();
       setNotes((prevNotes) =>
-        prevNotes.map((note) => (note.id === savedNote.id ? savedNote : note)),
+        prevNotes.map((note) => (note.id === savedNote.id ? savedNote : note))
       );
     } catch (err) {
-      setNotes((prevNotes) =>
-        prevNotes.map((note) =>
-          note.id === updatedNote.id ? note : updatedNote,
-        ),
-      );
       throw err;
     }
   };
 
   const deleteNote = async (id: string) => {
-    const noteToDelete = notes.find((note) => note.id === id);
-    setNotes((prevNotes) => prevNotes.filter((note) => note.id !== id));
     try {
       const response = await fetch("/api/notes", {
         method: "DELETE",
@@ -116,8 +98,8 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ id }),
       });
       if (!response.ok) throw new Error("Failed to delete note");
+      setNotes((prevNotes) => prevNotes.filter((note) => note.id !== id));
     } catch (err) {
-      if (noteToDelete) setNotes((prevNotes) => [...prevNotes, noteToDelete]);
       throw err;
     }
   };

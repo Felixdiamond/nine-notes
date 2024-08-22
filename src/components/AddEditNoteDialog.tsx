@@ -1,3 +1,4 @@
+// AddNoteDialog.tsx
 import { CreateNoteSchema, createNoteSchema } from "@/lib/validation/note";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -50,49 +51,15 @@ export default function AddNoteDialog({
   async function onSubmit(input: CreateNoteSchema) {
     try {
       if (noteToEdit) {
-        const updatedNote: Note = {
-          ...noteToEdit,
+        await updateNote({
+          id: noteToEdit.id,
           ...input,
           content: input.content || null,
-        };
-
-        updateNote(updatedNote); // Optimistic update
-        setOpen(false);
-
-        const response = await fetch("/api/notes", {
-          method: "PUT",
-          body: JSON.stringify({
-            id: noteToEdit.id,
-            ...input,
-            content: input.content || null,
-          }),
         });
-        if (!response.ok) throw new Error("Status code: " + response.status);
-
-        const savedNote: Note = await response.json();
-        updateNote(savedNote); // Update with server response
       } else {
-        const newNote: Note = {
-          id: Date.now().toString(), // Temporary ID
-          ...input,
-          content: input.content || null,
-          userId: "temp-user-id",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
-
-        addNote(newNote); // Optimistic update
-        setOpen(false);
-
-        const response = await fetch("/api/notes", {
-          method: "POST",
-          body: JSON.stringify(newNote),
-        });
-        if (!response.ok) throw new Error("Status code: " + response.status);
-
-        const savedNote: Note = await response.json();
-        updateNote(savedNote); // Update with server response
+        await addNote(input);
       }
+      setOpen(false);
       form.reset();
     } catch (error) {
       console.error(error);
@@ -107,16 +74,8 @@ export default function AddNoteDialog({
     if (!noteToEdit) return;
     setDeletionInProgress(true);
     try {
-      deleteNote(noteToEdit.id); // Optimistic update
+      await deleteNote(noteToEdit.id);
       setOpen(false);
-
-      const response = await fetch("/api/notes", {
-        method: "DELETE",
-        body: JSON.stringify({
-          id: noteToEdit.id,
-        }),
-      });
-      if (!response.ok) throw new Error("Status code: " + response.status);
     } catch (error) {
       console.error(error);
       toast({
