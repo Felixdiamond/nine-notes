@@ -36,7 +36,7 @@ export default function NotesPage() {
             <AddBtn />
           </div>
         )}
-        {error && <p className="text-center text-red-500">{error}</p>}
+        {error && <p className="text-center text-sm mt-5">{error}</p>}
       </div>
       <ChatManager />
     </>
