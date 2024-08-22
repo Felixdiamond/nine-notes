@@ -1,4 +1,3 @@
-// AddNoteDialog.tsx
 import { CreateNoteSchema, createNoteSchema } from "@/lib/validation/note";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,6 +23,8 @@ import { Note } from "@prisma/client";
 import { useState } from "react";
 import { useNotes } from "@/contexts/NotesContext";
 import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+import { Maximize2 } from "lucide-react";
 
 interface AddNoteDialogProps {
   open: boolean;
@@ -39,6 +40,7 @@ export default function AddNoteDialog({
   const [deletionInProgress, setDeletionInProgress] = useState(false);
   const { addNote, updateNote, deleteNote } = useNotes();
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<CreateNoteSchema>({
     resolver: zodResolver(createNoteSchema),
@@ -87,6 +89,11 @@ export default function AddNoteDialog({
     }
   }
 
+  const handleFullScreen = () => {
+    const noteId = noteToEdit ? noteToEdit.id : 'new';
+    router.push(`/notes/${noteId}/edit`);
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[425px]">
@@ -131,27 +138,37 @@ export default function AddNoteDialog({
                 </FormItem>
               )}
             />
-            <div className="flex justify-end gap-4">
-              {noteToEdit && (
+            <div className="flex justify-between items-center">
+              <button
+                type="button"
+                onClick={handleFullScreen}
+                className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
+              >
+                <Maximize2 size={20} />
+                Full Screen
+              </button>
+              <div className="flex gap-4">
+                {noteToEdit && (
+                  <LoadingButton
+                    variant="destructive"
+                    loading={deletionInProgress}
+                    disabled={form.formState.isSubmitting || deletionInProgress}
+                    onClick={() => handleDelete()}
+                    type="button"
+                    className="w-full sm:w-auto"
+                  >
+                    Delete note
+                  </LoadingButton>
+                )}
                 <LoadingButton
-                  variant="destructive"
-                  loading={deletionInProgress}
+                  type="submit"
+                  loading={form.formState.isSubmitting}
                   disabled={form.formState.isSubmitting || deletionInProgress}
-                  onClick={() => handleDelete()}
-                  type="button"
                   className="w-full sm:w-auto"
                 >
-                  Delete note
+                  {noteToEdit ? "Save changes" : "Add note"}
                 </LoadingButton>
-              )}
-              <LoadingButton
-                type="submit"
-                loading={form.formState.isSubmitting}
-                disabled={form.formState.isSubmitting || deletionInProgress}
-                className="w-full sm:w-auto"
-              >
-                {noteToEdit ? "Save changes" : "Add note"}
-              </LoadingButton>
+              </div>
             </div>
           </form>
         </Form>

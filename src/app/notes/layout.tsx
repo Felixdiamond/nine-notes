@@ -4,7 +4,7 @@ import { Suspense, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 // Inline SVG loader component
-function Loader({ isDark = false }: { isDark?: boolean }) {
+export function Loader({ isDark = false }: { isDark?: boolean }) {
   const color = isDark ? "#616161" : "#9CA3AF";
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" className="w-6 h-6">

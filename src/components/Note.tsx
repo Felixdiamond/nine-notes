@@ -1,4 +1,3 @@
-// Note.tsx
 "use client";
 import { Note as NoteModel } from "@prisma/client";
 import {
@@ -20,11 +19,17 @@ interface NoteProps {
 export default function Note({ note }: NoteProps) {
   const [showEditDialog, setShowEditDialog] = useState(false);
 
-  const wasUpdated =
-    note.updatedAt && note.createdAt && note.updatedAt > note.createdAt;
+  // Ensure note data is valid
+  const hasTitle = Boolean(note.title);
+  const hasContent = Boolean(note.content);
+  const hasUpdatedAt = Boolean(note.updatedAt);
+  const hasCreatedAt = Boolean(note.createdAt);
+
+  // Handle timestamp formatting
+  const wasUpdated = hasUpdatedAt && hasCreatedAt && note.updatedAt > note.createdAt;
   const timeAgo = wasUpdated
     ? formatDistanceToNow(note.updatedAt, { addSuffix: true })
-    : note.createdAt
+    : hasCreatedAt
     ? formatDistanceToNow(note.createdAt, { addSuffix: true })
     : "Just now";
 
@@ -36,7 +41,7 @@ export default function Note({ note }: NoteProps) {
       >
         <CardHeader>
           <CardTitle className="truncate text-xl font-bold">
-            {note.title}
+            {hasTitle ? note.title : "Untitled"}
           </CardTitle>
           <CardDescription className="text-sm text-gray-700 dark:text-gray-200">
             <div className="flex">
@@ -47,7 +52,7 @@ export default function Note({ note }: NoteProps) {
         </CardHeader>
         <CardContent className="mt-4">
           <div className="line-clamp-3 whitespace-pre-line text-gray-600 sm:text-sm">
-            {note.content}
+            {hasContent ? note.content : "No content"}
           </div>
         </CardContent>
       </Card>

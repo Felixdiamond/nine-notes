@@ -1,4 +1,3 @@
-// NotesContext.tsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Note } from "@prisma/client";
 import { useAuth } from "./AuthContext";
@@ -15,6 +14,8 @@ interface NotesContextType {
   currentPage: number;
   totalPages: number;
   loadMoreNotes: () => Promise<void>;
+  refreshNotes: () => Promise<void>; 
+  getNoteById: (id: string) => Note | undefined;
 }
 
 const NotesContext = createContext<NotesContextType | undefined>(undefined);
@@ -59,6 +60,7 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
   };
 
   const addNote = async (note: CreateNoteSchema) => {
+    console.log("adding note: " ,note)
     try {
       const response = await fetch("/api/notes", {
         method: "POST",
@@ -66,8 +68,10 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify(note),
       });
       if (!response.ok) throw new Error("Failed to add note");
-      const savedNote: Note = await response.json();
-      setNotes((prevNotes) => [savedNote, ...prevNotes]);
+      await response.json(); // Ensure the note is added
+
+      // Refetch notes to include the newly added note
+      await refreshNotes();
     } catch (err) {
       throw err;
     }
@@ -85,6 +89,9 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
       setNotes((prevNotes) =>
         prevNotes.map((note) => (note.id === savedNote.id ? savedNote : note))
       );
+
+      // Refetch notes to include the updated note
+      await refreshNotes();
     } catch (err) {
       throw err;
     }
@@ -99,10 +106,22 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
       });
       if (!response.ok) throw new Error("Failed to delete note");
       setNotes((prevNotes) => prevNotes.filter((note) => note.id !== id));
+
+      // Refetch notes to exclude the deleted note
+      await refreshNotes();
     } catch (err) {
       throw err;
     }
   };
+
+  // Function to refetch notes
+  const refreshNotes = async () => {
+    await fetchNotes(1); // Refetch notes from the first page
+  };
+
+  const getNoteById = (id: string) => {
+    return notes.find((note) => note.id === id);
+  }
 
   return (
     <NotesContext.Provider
@@ -117,6 +136,8 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
         currentPage,
         totalPages,
         loadMoreNotes,
+        refreshNotes,
+        getNoteById,
       }}
     >
       {children}
