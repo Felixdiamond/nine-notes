@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -91,6 +91,9 @@ const SignInPage = () => {
           <CardTitle className="text-center text-2xl font-bold">
             Sign In
           </CardTitle>
+          <CardDescription className="text-center">
+            Log in to view your notes
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div>
